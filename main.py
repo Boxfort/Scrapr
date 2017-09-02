@@ -9,26 +9,40 @@ from bs4 import BeautifulSoup
 
 soup = BeautifulSoup
 
-parser = argparse.ArgumentParser(description='Download images from images from a tumblr.')
-parser.add_argument('name', help='The name of the tumblr.')
-parser.add_argument('--tags', nargs='*', dest='tags', help='Image must contain one or more of the supplied tags.')
+#Defining command line arguments
+parser = argparse.ArgumentParser(description='Download images from a tumblr.')
+parser.add_argument('name', help='Name of blog')
+parser.add_argument('-t', nargs=1, dest='tag', help='Download images with specified tag.')
+parser.add_argument('-p', nargs=1, dest='page', type=int, help='Page to start on.')
+parser.add_argument('-n', nargs=1, dest='pages', type=int, help='Number of pages to scrape.')
 
 downloadCount = 0
-args = []
 
-def getPageURLs():
-    url = 'http://'+str(args['name'])+'.tumblr.com/'
+def getPageURLs(name, tag, page):
+
+    #Build the blog url including any tags and page numbers
+    url = 'http://'+str(name)+'.tumblr.com/'
+    if tag != None:
+        url += 'tagged/'+tag[0]+'/' 
+    if page != None:
+        url += 'page/'+str(page)
+
     print("Opening URL: " + url)
-    page = urllib2.urlopen(url)
+    try:
+        page = urllib2.urlopen(url)
+    except Exception:
+        return None
+
 
     #parse html
     html = soup(page, 'html.parser')
     posts = html.findAll('a')
 
+    #Gather all of the post urls to get full size images
     urls = []
     for tag in posts:
         try:
-            if "tumblr.com/post" in tag['href']:
+            if "tumblr.com/post" in tag['href'] and tag['href'].startswith('http://'+str(name)+'.tumblr.com/'):
                 urls.append(tag['href'])
         except Exception:
             pass
@@ -38,17 +52,23 @@ def getImageURLs(urls):
     print("Retreiving Image URLs...")
     imgURLs = []
     for url in urls:
-        page = urllib2.urlopen(iriToUri(url))
-        html = soup(page, 'html.parser')
+        
+        try:
+            page = urllib2.urlopen(iriToUri(url))
+            html = soup(page, 'html.parser')
+    
+            allImages = html.findAll('img')
 
-        allImages = html.findAll('img')
+            for tag in allImages:
+                try:
+                    if "/tumblr_" in tag['src'] and "/tumblr_static" not in tag['src'] and tag['src'] not in imgURLs:
+                        imgURLs.append(tag['src'])
+                        print(tag['src'])
+                except Exception:
+                    pass
+        except Exception:
+            pass
 
-        for tag in allImages:
-            try:
-                if "/tumblr_" in tag['src'] and "/tumblr_static" not in tag['src']:
-                    imgURLs.append(tag['src'])
-            except Exception:
-                pass
     return imgURLs
 
 def downloadImages(imgURLs):
@@ -82,13 +102,25 @@ def iriToUri(iri):
     )
    
 def main():
-    global args
     args = vars(parser.parse_args())
     print(args)
 
-    urls = getPageURLs()
-    imgURLs = getImageURLs(urls)
-    downloadImages(imgURLs)
+    if not args['pages']:
+        args['pages'] = [1]
+
+    if not args['page']:
+        args['page'] = [1]
+
+    print(args['pages'])
+    print(args['page'])
+    print(args['page'][0], (args['page'][0] - 1) + args['pages'][0])
+
+    for i in range(args['page'][0], args['page'][0] + args['pages'][0]):
+        urls = getPageURLs(args['name'], args['tag'], i)
+        if not urls:
+            exit()
+        imgURLs = getImageURLs(urls)
+        downloadImages(imgURLs)
     
 if __name__ == "__main__": main()
 
