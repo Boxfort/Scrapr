@@ -13,8 +13,8 @@ soup = BeautifulSoup
 parser = argparse.ArgumentParser(description='Download images from a tumblr.')
 parser.add_argument('name', help='Name of blog')
 parser.add_argument('-t', nargs=1, dest='tag', help='Download images with specified tag.')
-parser.add_argument('-p', nargs=1, dest='page', type=int, help='Page to start on.')
-parser.add_argument('-n', nargs=1, dest='pages', type=int, help='Number of pages to scrape.')
+parser.add_argument('-p', nargs=1, dest='page', type=int, default=[1], help='Page to start on.')
+parser.add_argument('-n', nargs=1, dest='pages', type=int, default=[1], help='Number of pages to scrape.')
 
 downloadCount = 0
 
@@ -28,6 +28,7 @@ def getPageURLs(name, tag, page):
         url += 'page/'+str(page)
 
     print("Opening URL: " + url)
+
     try:
         page = urllib2.urlopen(url)
     except Exception:
@@ -104,16 +105,6 @@ def iriToUri(iri):
 def main():
     args = vars(parser.parse_args())
     print(args)
-
-    if not args['pages']:
-        args['pages'] = [1]
-
-    if not args['page']:
-        args['page'] = [1]
-
-    print(args['pages'])
-    print(args['page'])
-    print(args['page'][0], (args['page'][0] - 1) + args['pages'][0])
 
     for i in range(args['page'][0], args['page'][0] + args['pages'][0]):
         urls = getPageURLs(args['name'], args['tag'], i)
