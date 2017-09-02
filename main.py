@@ -4,24 +4,25 @@ import urllib
 import threading
 import sys
 import argparse
-import re, urlparse
+import re
+import urlparse
 import os
 from bs4 import BeautifulSoup
 
 soup = BeautifulSoup
 
 #Defining command line arguments
-parser = argparse.ArgumentParser(description='Download images from a tumblr.')
-parser.add_argument('name', help='Name of blog')
-parser.add_argument('-t', nargs=1, dest='tag', help='Download images with specified tag.')
-parser.add_argument('-p', nargs=1, dest='page', type=int, default=[1], help='Page to start on.')
-parser.add_argument('-n', nargs=1, dest='pages', type=int, default=[1], help='Number of pages to scrape.')
-parser.add_argument('-d', nargs=1, dest='directory', default=[os.getcwd()], help='Directory to save the images.')
+parser = argparse.ArgumentParser(description='download images from a tumblr.')
+parser.add_argument('name', help='name of blog')
+parser.add_argument('-t', nargs=1, dest='tag', help='download images with specified tag.')
+parser.add_argument('-p', nargs=1, dest='page', type=int, default=[1], help='page to start on.')
+parser.add_argument('-n', nargs=1, dest='pages', type=int, default=[1], help='number of pages to scrape.')
+parser.add_argument('-d', nargs=1, dest='directory', default=[os.getcwd()], help='directory to save the images.')
 
 downloadCount = 0
 directory = None
 
-def getPageURLs(name, tag, page):
+def get_page_urls(name, tag, page):
 
     #Build the blog url including any tags and page numbers
     url = 'http://'+str(name)+'.tumblr.com/'
@@ -51,13 +52,13 @@ def getPageURLs(name, tag, page):
             pass
     return urls
 
-def getImageURLs(urls):
+def get_image_urls(urls):
     print("Retreiving Image URLs...")
     imgURLs = []
     for url in urls:
         
         try:
-            page = urllib2.urlopen(iriToUri(url))
+            page = urllib2.urlopen(iri_to_uri(url))
             html = soup(page, 'html.parser')
     
             allImages = html.findAll('img')
@@ -74,40 +75,42 @@ def getImageURLs(urls):
 
     return imgURLs
 
-def downloadImages(imgURLs):
-    threads = [threading.Thread(target=downloadImage, args=(url,)) for url in imgURLs]
+def download_images(imgURLs):
+    #Create a thread for each image to download concurrently
+    threads = [threading.Thread(target=download_image, args=(url,)) for url in imgURLs]
     for thread in threads:
         thread.start()
     for thread in threads:
         thread.join()
     print("\nDownloads Complete.")
 
-def downloadImage(url):
+def download_image(url):
     imgName = url.rsplit('/', 1)[1]
     try:
         if not os.path.exists(directory):
             os.makedirs(os.path.join(directory))
 
         urllib.urlretrieve(url, os.path.join(directory, imgName))
-        onDownloadComplete()
+        on_download_complete()
     except Exception as e:
         print(str(e))
         exit()
 
-def onDownloadComplete():
+def on_download_complete():
+    #Outputs a counter of amount of images downloaded
     global downloadCount
     downloadCount = downloadCount + 1
     message = "\rImages Downloaded: " + str(downloadCount)
     sys.stdout.write(message)
     sys.stdout.flush()
 
-def urlEncodeNonAscii(b):
+def url_encode_non_ascii(b):
     return re.sub('[\x80-\xFF]', lambda c: '%%%02x' % ord(c.group(0)), b)
 
-def iriToUri(iri):
+def iri_to_uri(iri):
     parts= urlparse.urlparse(iri)
     return urlparse.urlunparse(
-        part.encode('idna') if parti==1 else urlEncodeNonAscii(part.encode('utf-8'))
+        part.encode('idna') if parti==1 else url_encode_non_ascii(part.encode('utf-8'))
         for parti, part in enumerate(parts)
     )
    
@@ -116,12 +119,13 @@ def main():
     args = vars(parser.parse_args())
     directory = os.path.join(args['directory'][0], args['name'])
 
+    #Download images from starting page to range specified
     for i in range(args['page'][0], args['page'][0] + args['pages'][0]):
-        urls = getPageURLs(args['name'], args['tag'], i)
+        urls = get_page_urls(args['name'], args['tag'], i)
         if not urls:
             print("No images found.")
             exit()
-        imgURLs = getImageURLs(urls)
-        downloadImages(imgURLs)
+        imgURLs = get_image_urls(urls)
+        download_images(imgURLs)
     
 if __name__ == "__main__": main()
