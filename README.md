@@ -13,16 +13,17 @@ Scrapr is a simple command line image scraper for https://www.tumblr.com.
 
 Positional arguments:
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name of blog
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name of blog
 
 Optional arguments:
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-h, --help&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;show this help message and exit
   
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-t TAG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Download images with specified tag.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-t TAG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;download images with specified tag.
   
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-p PAGE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Page to start on.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-p PAGE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;page to start on.
   
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-n PAGES&nbsp;&nbsp;&nbsp;&nbsp;Number of pages to scrape.
-  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-n PAGES&nbsp;&nbsp;&nbsp;&nbsp;number of pages to scrape.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-d DIRECTORY &nbsp;&nbsp;  directory to save the images.
 
