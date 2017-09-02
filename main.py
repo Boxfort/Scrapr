@@ -16,7 +16,7 @@ parser.add_argument('name', help='Name of blog')
 parser.add_argument('-t', nargs=1, dest='tag', help='Download images with specified tag.')
 parser.add_argument('-p', nargs=1, dest='page', type=int, default=[1], help='Page to start on.')
 parser.add_argument('-n', nargs=1, dest='pages', type=int, default=[1], help='Number of pages to scrape.')
-parser.add_argument('-d', nargs=1, dest='directory', type=int, default=[os.getcwd()], help='Directory to save the images.')
+parser.add_argument('-d', nargs=1, dest='directory', default=[os.getcwd()], help='Directory to save the images.')
 
 downloadCount = 0
 directory = None
