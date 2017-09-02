@@ -1,9 +1,9 @@
 #import libraries
 import urllib2
+import urllib
 from bs4 import BeautifulSoup
 
 soup = BeautifulSoup;
-
 
 def getPageURLs():
     #test url
@@ -39,10 +39,16 @@ def getImageURLs(urls):
                 pass
     return imgURLs
 
+def downloadImages(imgURLs):
+    for imgURL in imgURLs:
+        imgName = imgURL.rsplit('/', 1)[1];
+        urllib.urlretrieve(imgURL, imgName)
+
 def main():
     urls = getPageURLs()
     imgURLs = getImageURLs(urls)
     print(imgURLs)
+    downloadImages(imgURLs)
 
 if __name__ == "__main__": main()
 
