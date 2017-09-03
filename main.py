@@ -19,6 +19,7 @@ parser.add_argument('-p', nargs=1, dest='page', type=int, default=[1], help='pag
 parser.add_argument('-n', nargs=1, dest='pages', type=int, default=[1], help='number of pages to scrape.')
 parser.add_argument('-d', nargs=1, dest='directory', default=[os.getcwd()], help='directory to save the images.')
 
+totalDownload = 0
 downloadCount = 0
 directory = None
 
@@ -54,6 +55,10 @@ def get_page_urls(name, tag, page):
 
 def get_image_urls(urls):
     print("Retreiving Image URLs...")
+    global totalDownload
+    global downloadCount
+    downloadCount = 0
+    totalDownload = 0
     imgURLs = []
     for url in urls:
         
@@ -67,6 +72,7 @@ def get_image_urls(urls):
                 try:
                     if "68.media" in tag['src'] and "/tumblr_static" not in tag['src'] and "avatar" not in tag['src'] and tag['src'] not in imgURLs:
                         imgURLs.append(tag['src'])
+                        totalDownload += 1
                         print(tag['src'])
                 except Exception:
                     pass
@@ -91,17 +97,19 @@ def download_image(url):
             os.makedirs(os.path.join(directory))
 
         urllib.urlretrieve(url, os.path.join(directory, imgName))
-        on_download_complete()
+        on_download_complete(imgName)
     except Exception as e:
         print(str(e))
         exit()
 
-def on_download_complete():
-    #Outputs a counter of amount of images downloaded
+def on_download_complete(imgName):
+    length = 60
     global downloadCount
-    downloadCount = downloadCount + 1
-    message = "\rImages Downloaded: " + str(downloadCount)
-    sys.stdout.write(message)
+    downloadCount += 1
+    filled = int(round(length * downloadCount / float(totalDownload)))
+    percents = round(100.0 * downloadCount / float(totalDownload), 1)
+    bar = '=' * filled + '-' * (length - filled)
+    sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', imgName))
     sys.stdout.flush()
 
 def url_encode_non_ascii(b):
