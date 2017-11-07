@@ -9,7 +9,7 @@ Scrapr is a simple command line image scraper for https://www.tumblr.com.
   * `sudo apt-get install python-dev`
 
 ## Usage
-**python main.py [-h] [-t TAG] [-p PAGE] [-n PAGES] name**
+**python main.py [-h] [-t TAG] [-p PAGE] [-n PAGES] [-d DIRECTORY] name**
 
 Positional arguments:
 
